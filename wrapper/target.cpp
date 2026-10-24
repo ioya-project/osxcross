@@ -604,6 +604,7 @@ bool Target::setup() {
     { Arch::x86_64h, {10, 8} },
     { Arch::arm64,   {11, 0} },
     { Arch::arm64e,  {11, 0} },
+    { Arch::armv7,   {11, 0} },
   };
 
   for (auto &RequiredSDK : RequiredSDKVersion) {
@@ -956,13 +957,14 @@ bool Target::setup() {
     case Arch::i486:
     case Arch::i586:
     case Arch::i686:
+    case Arch::armv7:
       is32bit = true;
       // falls through
     case Arch::arm64:
     case Arch::arm64e:
     case Arch::x86_64:
     case Arch::x86_64h:
-      isArm = arch == Arch::arm64 || arch == Arch::arm64e;
+      isArm = arch == Arch::arm64 || arch == Arch::arm64e || arch == Arch::armv7;
       if (isGCC()) {
         if (arch != Arch::x86_64 && arch != Arch::i386 &&
             arch != Arch::arm64) {

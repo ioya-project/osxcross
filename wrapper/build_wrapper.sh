@@ -158,6 +158,7 @@ function install_program_links
       i386) shortcut=o32 ;;
       x86_64) shortcut=o64 ;;
       x86_64h) shortcut=o64h ;;
+      armv7) shortcut=oa32 ;;
       arm64 | aarch64) shortcut=oa64 ;;
       arm64e) shortcut=oa64e ;;
       *)
