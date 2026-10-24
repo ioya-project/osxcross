@@ -286,6 +286,8 @@ function build_stable()
     pushd $CURRENT_BUILD_PROJECT_NAME/cctools &>/dev/null
     echo ""
 
+    patch -p1 < $PATCH_DIR/cctools-llvm23.patch
+
     CONFFLAGS="--prefix=$TARGET_DIR --target=$(first_supported_arch)-apple-$TARGET "
     if [ $NEED_TAPI_SUPPORT -eq 1 ]; then
       CONFFLAGS+="--with-libtapi=$TARGET_DIR "
