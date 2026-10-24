@@ -210,6 +210,7 @@ struct Target {
   ClangVersion clangversion;
   GCCVersion gccversion;
   bool usegcclibs;
+  int nostdinc;
   int wliblto;
   Compiler compiler;
   std::string compilerpath;     // /usr/bin/clang | [...]/target/bin/*-gcc

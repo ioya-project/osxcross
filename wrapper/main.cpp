@@ -198,6 +198,11 @@ bool liblto(Target &target, const char *opt, const char *, char **) {
   return true;
 }
 
+bool nostdinc(Target &target, const char *opt, const char *, char **) {
+  target.nostdinc = !strcmp(opt, "-nostdinc") ? 2 : 1;
+  return true;
+}
+
 bool checkincludepath(Target &, const char *opt, const char *path, char **) {
 #ifndef __APPLE__
   constexpr const char *DangerousIncludePaths[] = { "/usr/include",
@@ -236,7 +241,7 @@ bool checkincludepath(Target &, const char *opt, const char *path, char **) {
   return true;
 }
 
-typedef OptParser<optFun, 19> Parser;
+typedef OptParser<optFun, 21> Parser;
 typedef Parser::ValueMode ValueMode;
 typedef Parser::Forwarding Forwarding;
 
@@ -255,6 +260,8 @@ const Parser parser = {{
   {"-foc-run-prog", runprog, ValueMode::joinedWithEquals},
   {"-Wliblto", liblto, ValueMode::none, Forwarding::keep},
   {"-Wno-liblto", liblto, ValueMode::none, Forwarding::keep},
+  {"-nostdinc", nostdinc, ValueMode::none, Forwarding::keep},
+  {"-nostdlibinc", nostdinc, ValueMode::none, Forwarding::keep},
   {"-isystem", checkincludepath, ValueMode::joinedOrSeparate,
    Forwarding::keep},
   {"-icxx-isystem", checkincludepath, ValueMode::joinedOrSeparate,

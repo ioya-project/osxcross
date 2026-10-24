@@ -44,7 +44,7 @@ Target::Target()
     : vendor(getDefaultVendor()), SDK(getenv("OSXCROSS_SDKROOT")),
       supportedarchs(getSupportedArchs()),
       arch(getDefaultArch()), target(getDefaultTarget()), stdlib(StdLib::unset),
-      usegcclibs(), wliblto(-1), compiler(getDefaultCompilerIdentifier()),
+      usegcclibs(), nostdinc(0), wliblto(-1), compiler(getDefaultCompilerIdentifier()),
       compilername(getDefaultCompilerName()), language() {
   if (!getExecutablePath(execpath, sizeof(execpath)))
     abort();
@@ -891,41 +891,45 @@ bool Target::setup() {
     fargs.push_back(path);
   };
 
-  addCXXHeaderPath(CXXHeaderPath);
+  if (nostdinc == 0) {
+    addCXXHeaderPath(CXXHeaderPath);
 
-  for (auto &path : AdditionalCXXHeaderPaths)
-    addCXXHeaderPath(path);
+    for (auto &path : AdditionalCXXHeaderPaths)
+      addCXXHeaderPath(path);
 
-  if (getenv("OSXCROSS_MP_INC")) {
-    std::string MacPortsIncludeDir;
-    std::string MacPortsLibraryDir;
-    std::string MacPortsFrameworksDir;
+    if (getenv("OSXCROSS_MP_INC")) {
+      std::string MacPortsIncludeDir;
+      std::string MacPortsLibraryDir;
+      std::string MacPortsFrameworksDir;
 
-    // Add them to args (instead of fargs),
-    // so the user's -I / -L / -F is prefered.
+      // Add them to args (instead of fargs),
+      // so the user's -I / -L / -F is prefered.
 
-    if (getMacPortsIncludeDir(MacPortsIncludeDir)) {
-      args.push_back("-isystem");
-      args.push_back(MacPortsIncludeDir);
+      if (getMacPortsIncludeDir(MacPortsIncludeDir)) {
+        args.push_back("-isystem");
+        args.push_back(MacPortsIncludeDir);
 
-      if (getMacPortsLibDir(MacPortsLibraryDir)) {
-        if (isClang())
-          args.push_back("-Qunused-arguments");
+        if (getMacPortsLibDir(MacPortsLibraryDir)) {
+          if (isClang())
+            args.push_back("-Qunused-arguments");
 
-        args.push_back("-L");
-        args.push_back(MacPortsLibraryDir);
-      }
+          args.push_back("-L");
+          args.push_back(MacPortsLibraryDir);
+        }
 
-      if (getMacPortsFrameworksDir(MacPortsFrameworksDir)) {
-        args.push_back("-iframework");
-        args.push_back(MacPortsFrameworksDir);
+        if (getMacPortsFrameworksDir(MacPortsFrameworksDir)) {
+          args.push_back("-iframework");
+          args.push_back(MacPortsFrameworksDir);
+        }
       }
     }
   }
 
-  if (isClang() && !ClangIntrinsicPath.empty()) {
-    fargs.push_back("-isystem");
-    fargs.push_back(ClangIntrinsicPath);
+  if (nostdinc <= 1) {
+    if (isClang() && !ClangIntrinsicPath.empty()) {
+      fargs.push_back("-isystem");
+      fargs.push_back(ClangIntrinsicPath);
+    }
   }
 
   if (OSNum.Num()) {
